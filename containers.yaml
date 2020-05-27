@@ -1,0 +1,6 @@
+name: ssh-test-container
+image: nginx
+volumeMounts:
+- name: secret-volume
+  readOnly: true
+  mountPath: "/etc/secret-volume"
