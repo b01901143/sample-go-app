@@ -5,13 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"errors"
-	"gopkg.in/yaml.v2"
 
 	"b01901143.git/sample-go-app/config"
 )
 
 type options struct {
 	configPath    string
+	dynamic    	  bool
 }
 
 func (o *options) Validate() error {
@@ -25,6 +25,7 @@ func (o *options) Validate() error {
 func gatherOptions() options {
 	o := options{}
 	flag.StringVar(&o.configPath, "config-path", "", "Path to config.yaml.")
+	flag.BoolVar(&o.dynamic, "dynamic", false, "Load config.yaml to dynamic structure.")
 	flag.Parse()
 	return o
 }
@@ -36,13 +37,11 @@ func main() {
 		fmt.Println("Invalid options: %v", err)
 	}
 
-	conf, err := config.LoadConfig(o.configPath)
+	conf, err := config.LoadConfig(o.configPath, o.dynamic)
 	if err != nil {
 		fmt.Println("Error loading config.")
 	}
-	// fmt.Println("main: ", *conf)
 
-	d, err := yaml.Marshal(conf)
-	fmt.Println(string(d))
+	conf.PrintStruct()
 
 }
