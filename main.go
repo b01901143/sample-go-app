@@ -1,17 +1,17 @@
-
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"errors"
+	"os"
 
 	"b01901143.git/sample-go-app/config"
 )
 
 type options struct {
-	configPath    string
-	dynamic    	  bool
+	configPath string
+	dynamic    bool
 }
 
 func (o *options) Validate() error {
@@ -30,16 +30,25 @@ func gatherOptions() options {
 	return o
 }
 
+func printHelp() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
+}
+
 func main() {
 	o := gatherOptions()
 
 	if err := o.Validate(); err != nil {
-		fmt.Println("Invalid options: %v", err)
+		fmt.Println("Invalid options: ", err)
+		printHelp()
+		os.Exit(1)
 	}
 
 	conf, err := config.LoadConfig(o.configPath, o.dynamic)
 	if err != nil {
-		fmt.Println("Error loading config.")
+		fmt.Println("Error loading config: ", err)
+		printHelp()
+		os.Exit(1)
 	}
 
 	conf.PrintStruct()

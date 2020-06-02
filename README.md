@@ -11,12 +11,10 @@ Sample go app demonstrating use of go modules.
 ## Usage
 Build go app
 ```
-# build the config module
-cd config
+# build
 go build
 
-# install app
-cd ..
+# or install
 go install b01901143.git/sample-go-app
 ```
 
