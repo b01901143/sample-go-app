@@ -1,17 +1,17 @@
-
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"errors"
-	"gopkg.in/yaml.v2"
+	"os"
 
 	"b01901143.git/sample-go-app/config"
 )
 
 type options struct {
-	configPath    string
+	configPath string
+	dynamic    bool
 }
 
 func (o *options) Validate() error {
@@ -25,24 +25,32 @@ func (o *options) Validate() error {
 func gatherOptions() options {
 	o := options{}
 	flag.StringVar(&o.configPath, "config-path", "", "Path to config.yaml.")
+	flag.BoolVar(&o.dynamic, "dynamic", false, "Load config.yaml to dynamic structure.")
 	flag.Parse()
 	return o
+}
+
+func printHelp() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
 }
 
 func main() {
 	o := gatherOptions()
 
 	if err := o.Validate(); err != nil {
-		fmt.Println("Invalid options: %v", err)
+		fmt.Println("Invalid options: ", err)
+		printHelp()
+		os.Exit(1)
 	}
 
-	conf, err := config.LoadConfig(o.configPath)
+	conf, err := config.LoadConfig(o.configPath, o.dynamic)
 	if err != nil {
-		fmt.Println("Error loading config.")
+		fmt.Println("Error loading config: ", err)
+		printHelp()
+		os.Exit(1)
 	}
-	// fmt.Println("main: ", *conf)
 
-	d, err := yaml.Marshal(conf)
-	fmt.Println(string(d))
+	conf.PrintStruct()
 
 }
